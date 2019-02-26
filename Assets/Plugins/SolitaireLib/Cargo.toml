@@ -1,0 +1,12 @@
+[package]
+name = "solitaire"
+version = "0.1.0"
+authors = ["David J. Felix <felix.davidj@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "solitaire"
+crate-type = ["dylib"]
+
+[dependencies]
+rand = "0.6"
