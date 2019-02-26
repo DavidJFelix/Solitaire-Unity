@@ -55,7 +55,7 @@ fn create_standard_deck() -> Vec<Card> {
         Suit::Spades,
     ]
         .iter()
-        .map(|&suit| -> Vec<Card> {
+        .flat_map(|&suit| -> Vec<Card> {
             [
                 Rank::Ace,
                 Rank::Two,
@@ -75,7 +75,7 @@ fn create_standard_deck() -> Vec<Card> {
                 .map(|&rank| -> Card{ Card { rank, suit } })
                 .collect()
         }
-        ).flatten()
+        )
         .collect()
 }
 
