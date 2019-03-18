@@ -38,7 +38,7 @@ struct Card {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
-struct TableauPile {
+struct TableauPileState {
     pub face_down: Vec<Card>,
     pub face_up: Vec<Card>,
 }
@@ -52,12 +52,7 @@ struct GameState {
 }
 
 fn create_standard_deck() -> Vec<Card> {
-    [
-        Suit::Clubs,
-        Suit::Diamonds,
-        Suit::Hearts,
-        Suit::Spades,
-    ]
+    [Suit::Clubs, Suit::Diamonds, Suit::Hearts, Suit::Spades]
         .iter()
         .flat_map(|&suit| -> Vec<Card> {
             [
@@ -75,11 +70,10 @@ fn create_standard_deck() -> Vec<Card> {
                 Rank::Queen,
                 Rank::King,
             ]
-                .iter()
-                .map(|&rank| -> Card{ Card { rank, suit } })
-                .collect()
-        }
-        )
+            .iter()
+            .map(|&rank| -> Card { Card { rank, suit } })
+            .collect()
+        })
         .collect()
 }
 
@@ -102,23 +96,40 @@ fn parse_suit(suit: &str) -> Result<Suit, &'static str> {
     }
 }
 
-
 fn shuffle_deck(deck: &Vec<Card>) -> Vec<Card> {
     let mut order: Vec<(u64, &Card)> = (0..52)
-        .map(|_| -> u64{ rand::random::<u64>() })
+        .map(|_| -> u64 { rand::random::<u64>() })
         .zip(deck.iter())
         .collect();
-    order.sort_by_key(|(order, _)| -> u64{ *order });
-    order.iter()
+    order.sort_by_key(|(order, _)| -> u64 { *order });
+    order
+        .iter()
         .map(|(_, &card)| -> Card { card.clone() })
         .collect()
 }
 
+trait TableauPile {
+    fn new() -> Self;
+}
+
+impl TableauPile for TableauPileState {
+    fn new() -> Self {
+        TableauPileState {
+            face_down: Vec::new(),
+            face_up: Vec::new()
+        }
+    }
+}
+
 trait Game {
+    fn is_complete() -> bool;
+    fn is_won() -> bool;
     fn new() -> Self;
 }
 
 impl Game for GameState {
+    fn is_complete() -> bool {}
+    fn is_won() -> bool {}
     fn new() -> Self {
         let deck = shuffle_deck(&create_standard_deck());
         GameState {
@@ -152,12 +163,7 @@ impl Game for GameState {
                     face_up: deck[28..29].to_vec(),
                 },
             ],
-            foundation: [
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-            ],
+            foundation: [Vec::new(), Vec::new(), Vec::new(), Vec::new()],
             hand: deck[29..].to_vec(),
             waste: Vec::new(),
         }
